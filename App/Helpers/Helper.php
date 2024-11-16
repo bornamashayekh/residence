@@ -1,5 +1,8 @@
 <?php
 
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Dotenv\Dotenv;
 if (!function_exists('dd')) {
     /**
      * Dump the passed variables and end the script.
@@ -22,8 +25,29 @@ if (!function_exists('dd')) {
 
 function getPostDataInput()
 {
+    $dotenv = Dotenv::createImmutable(__DIR__ . '/../..');
+    $dotenv->load();
+    $secretKey =  $_ENV['SECRET_KEY'];
     $jsonData = file_get_contents('php://input');
     $postData = (object)json_decode($jsonData, true);
+    $request_token = getTokenFromRequest();
+    $token = $request_token->headers ?? $request_token->query ?? $request_token->body ?? null;
+    if ($token) {
+        try {
+            // Decode JWT token
+            $decoded = JWT::decode($token, new Key($secretKey, 'HS256'));
+
+            // Return decoded payload
+            // return $decoded;
+            if ($decoded) {
+                $postData->userDetail = $decoded;
+            }
+            // dd($postData);
+        } catch (\Exception $e) {
+            // If token is invalid or expired, return false
+            return false;
+        }
+    }
     return $postData;
 }
 function getPath($version = true)
@@ -40,4 +64,15 @@ function getApiVersion(){
     $version = $uriParts[0];
 
     return $version;
+}
+ function getTokenFromRequest(){
+    
+     $jsonData = file_get_contents('php://input');
+     $postData = (object)json_decode($jsonData, true);
+     return (object) [
+
+        "headers" => getallheaders()['token'] ?? null,
+        "query"   => $_GET['token'] ?? null,
+        "body"    => $postData->token ?? null
+    ];;
 }

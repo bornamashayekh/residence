@@ -9,11 +9,7 @@ use App\Controllers\AuthController;
 
 // ایجاد یک نمونه از میدلور
 $authMiddleware = new AuthMiddleware();
-$request = (object) [
-    "headers" => getallheaders()['token'] ?? null,
-    "query"   => $_GET['token'] ?? null,
-    "body"    => getPostDataInput()->token ?? null
-];
+$request = getTokenFromRequest();
 
 $response = $authMiddleware->handle($request);
 
