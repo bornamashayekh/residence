@@ -24,6 +24,15 @@ class WeatherController extends Controller
     }
     public function store($request)
     {
-        dd("access ok");
+                $this->validate([
+                        'title||required|min:3|max:50',
+
+                ],$request);
+                $newWeather = $this->queryBuilder->table('wheaters')->insert([
+                        'title' => $request->title,
+                        'created_at' => time(),
+                        'updated_at' => time(),
+                ]);
+                return $this->sendResponse(data: $newWeather, message: "اب و هوا ".$request->title."باموفقیت افزورده شد");
     }
 }
