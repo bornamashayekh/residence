@@ -3,21 +3,18 @@
 namespace App\Controllers;
 
 use App\Auth\JWTAuth as JWTAuth;
-use App\Database\QueryBuilder;
-use App\Traits\ResponseTrait;
-use App\Validations\ValidateData;
 
-class AuthController
+
+class AuthController extends Controller
 {
-    use ResponseTrait;
-    use JWTAuth;
-    use ValidateData;
 
-    protected $queryBuilder;
+    use JWTAuth;
+
+
 
     public function __construct()
     {
-        $this->queryBuilder = new QueryBuilder();
+        parent::__construct();  
     }
 
     public function login($request)
