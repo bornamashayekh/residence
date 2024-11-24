@@ -144,9 +144,10 @@ trait ValidateData
         if ($array) {
             foreach ($array as $item) {
                 $hasResourse = $this->queryBuilder->table($table)
-                    ->where($item[0], '=', $item[1])
-                    ->get()->execute();
-
+                ->where(column: $item[0], operator: '=', value: $item[1])
+                ->get()->execute();
+                // dd($hasResourse);
+               
                 if ($hasResourse) {
                     $this->sendResponse(message: "مقدار " . translate_key($item[0]) . " تکراری است یا از قبل وجود دارد!", error: true, status: HTTP_BadREQUEST);
                     return exit();

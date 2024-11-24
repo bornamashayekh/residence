@@ -24,4 +24,7 @@ $router->post('v1','/register', AuthController::class, 'register');
 $router->post('v1','/verify', AuthController::class, 'verify');
 // weathers
 $router->get('v1', '/weathers', WeatherController::class, 'index');
+$router->get('v1', '/weathers/{id}', WeatherController::class, 'get');
+$router->put('v1', '/weathers/{id}', WeatherController::class, 'update');
+$router->delete('v1', '/weathers/{id}', WeatherController::class, 'destroy');
 $router->post('v1', '/weathers', WeatherController::class, 'store');

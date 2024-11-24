@@ -43,8 +43,10 @@ class QueryBuilder {
         return $this;
     }
 
-    public function where($column, $operator, $value) {
-        $this->where[] = "$column $operator '$value'";
+    public function where( $value, $column="id", $operator="=") {
+      
+            $this->where[] = "$column $operator '$value'";
+        
         return $this;
     }
 
@@ -92,6 +94,7 @@ class QueryBuilder {
 
         if ($this->insertValues) {
             $sql = "INSERT INTO $this->table (" . implode(', ', array_keys($this->insertValues)) . ") VALUES ('" . implode("', '", array_values($this->insertValues)) . "')";
+           
             $statement = $this->pdo->prepare($sql);
             $success = $statement->execute();
             if($success) return true;
@@ -126,7 +129,7 @@ class QueryBuilder {
             foreach ($this->joins as $join) {
                 $sql .= " $join";
             }
-
+            $this->where[] = "deleted_at IS NULL";
             if (!empty($this->where)) {
                 $sql .= ' WHERE ' . implode(' AND ', $this->where);
             }
