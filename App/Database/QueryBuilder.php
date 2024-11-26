@@ -144,6 +144,7 @@ class QueryBuilder {
 
             if($this->getQuery){
                 $statement = $this->pdo->prepare($sql);
+                
                 $success = $statement->execute();
                 if (!$success) {
                     $errorInfo = $statement->errorInfo();
