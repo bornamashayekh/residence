@@ -11,14 +11,11 @@ class WeatherController extends Controller
     {
         parent::__construct();
 
-        $this->roles = ['admin', 'support'];
-
-        $data = getPostDataInput();
-        $this->Access->checkAccess($data->userDetail->role, $this->roles);
-
+ 
     }
     public function index()
     {
+        // dd("test");
         $weathers = $this->queryBuilder->table('weather')->getAll()->execute();
         return $this->sendResponse(data: $weathers, message: "آب و هوا  ها با موفقیت دریافت شدند");
     }

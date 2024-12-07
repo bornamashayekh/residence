@@ -27,6 +27,7 @@ class AuthMiddleware {
         // dd($this->verifyToken($token));
         // Verify the JWT token
         if (!$this->verifyToken($token)) {
+            // dd($token);
             $this->sendResponse(null, "Unauthorized Token!", true, 401);
             return exit();
         }

@@ -10,10 +10,6 @@ class DestinationController extends Controller
     {
         parent::__construct();
 
-        $this->roles = ['admin', 'support'];
-
-        $data = getPostDataInput();
-        $this->Access->checkAccess($data->userDetail->role, $this->roles);
 
     }
     public function index()

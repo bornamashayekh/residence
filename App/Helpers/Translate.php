@@ -11,7 +11,7 @@ function translate_key($input){
         "role" => "نقش کاربر",
         "status" => "وضعیت",
         "display_name" => "نام نمایشی",
-        "sharji" => "شرجی"
+        "title" => "شرجی",
     ];
 
     $isFind = false;

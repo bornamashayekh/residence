@@ -33,11 +33,12 @@ trait JWTAuth {
         try {
             // Decode JWT token
             $decoded = JWT::decode($token, new Key( $_ENV['SECRET_KEY'], 'HS256'));
-
+            // dd($decoded);
             // Return decoded payload
             return $decoded;
         } catch (\Exception $e) {
             // If token is invalid or expired, return false
+            // dd($decoded);
             return false;
         }
     }
