@@ -2,12 +2,13 @@
 
 namespace App\Routers;
 
-use App\Traits\ResponseTrait;
 use App\Middlewares\CheckAccessMiddleware;
+use App\Traits\ResponseTrait;
+
 class Router
 {
     use ResponseTrait;
- 
+
     private $routes = [];
     private $postData;
     private $access;
@@ -16,7 +17,7 @@ class Router
         $this->postData = getPostDataInput();
         $this->access = new CheckAccessMiddleware();
     }
-    public function get($version, $path, $controller, $method, $access = false , $inaccessabilty = false)
+    public function get($version, $path, $controller, $method, $access = false, $inaccessabilty = false)
     {
 
         $path = '/' . $version . $path;
@@ -71,13 +72,32 @@ class Router
             $requestMethod = $matchedRoute['requestMethod'];
             $request = $matchedRoute['request'];
             $access = $matchedRoute['access'];
+            $accessed_role = [];
             $inaccessabilty = $matchedRoute['inaccessabilty'];
-            if ($access) {
-                if ($access == "owners")
-                $this->access->checkAccess(['support','admin']);
-                else $this->access->checkAccess($access);
+            $not_accessed_role = [];
+            if (is_array($access)) {
+                $accessed_role = $access;
+            } else {
+                array_push($accessed_role, $access);
             }
-            else if($inaccessabilty) $this->access->checkAccess($inaccessabilty , false);
+
+            if (is_array($inaccessabilty)) {
+                $not_accessed_role = $inaccessabilty;
+            } else {
+                array_push($not_accessed_role, $inaccessabilty);
+            }
+
+            if ($access) {
+                if ($access == "owners") {
+                    $this->access->checkAccess(['support', 'admin']);
+                } else {
+                    $this->access->checkAccess($accessed_role);
+                }
+
+            } else if ($inaccessabilty) {
+                $this->access->checkAccess($not_accessed_role, false);
+            }
+
             $controllerInstance = new $controller();
             if (isset($matches) && count($matches) && $requestMethod != "put") {
                 $controllerInstance->$method($matches["id"]);

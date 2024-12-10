@@ -37,6 +37,8 @@ $router->post('v1', '/destinations', DestinationController::class, 'store','owne
 $router->put('v1', '/destinations/{id}', DestinationController::class, 'update','owners');
 $router->delete('v1', '/destinations/{id}', DestinationController::class, 'destroy');
 // Rooms
-$router->get('v1', '/rooms', RoomController::class, 'index',inaccessabilty: ['guest']);
-$router->get('v1', '/rooms/{id}', RoomController::class, 'get',inaccessabilty: ['guest']);
-$router->post('v1', '/rooms', RoomController::class, 'store',inaccessabilty: ['guest']);
+$router->get('v1', '/rooms', RoomController::class, 'index');
+$router->get('v1', '/rooms/{id}', RoomController::class, 'get');
+$router->post('v1', '/rooms', RoomController::class, 'store',inaccessabilty: 'geust');
+$router->put('v1', '/rooms/{id}', RoomController::class, 'update',inaccessabilty: 'geust');
+$router->delete('v1', '/rooms/{id}', RoomController::class, 'destroy' ,'owners');
