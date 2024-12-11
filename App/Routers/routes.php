@@ -42,3 +42,5 @@ $router->get('v1', '/rooms/{id}', RoomController::class, 'get');
 $router->post('v1', '/rooms', RoomController::class, 'store',inaccessabilty: 'geust');
 $router->put('v1', '/rooms/{id}', RoomController::class, 'update',inaccessabilty: 'geust');
 $router->delete('v1', '/rooms/{id}', RoomController::class, 'destroy' ,'owners');
+$router->post('v1', '/room/append_feature', RoomController::class, 'append_feature',inaccessabilty: 'geust');
+$router->post('v1', '/room/feature', RoomController::class, 'add_feature',inaccessabilty: 'geust');

@@ -14,18 +14,18 @@ class RoomController extends Controller
     public function index()
     {
 
-        
         $rooms = $this->queryBuilder->table('rooms')->getAll()->execute();
         return $this->sendresponse(message: "لیست اتاق ها با موفقیت دریافت شد", data: $rooms);
     }
     public function get($id)
     {
 
-       
-        $room = $this->queryBuilder->table('rooms')->where(value:$id)->get()->execute();
-       if($room) return $this->sendresponse(message: "اتاق مورد نظر با موفقیت دریافت شد", data: $room);
-        else {
-            return $this->sendresponse(message: "اتاق مورد نظر یافت نشد", error:true,status:HTTP_BadREQUEST );}
+        $room = $this->queryBuilder->table('rooms')->where(value: $id)->get()->execute();
+        if ($room) {
+            return $this->sendresponse(message: "اتاق مورد نظر با موفقیت دریافت شد", data: $room);
+        } else {
+            return $this->sendresponse(message: "اتاق مورد نظر یافت نشد", error: true, status: HTTP_BadREQUEST);
+        }
     }
 
     public function store($request)
@@ -57,9 +57,10 @@ class RoomController extends Controller
         ])->execute();
         return $this->sendResponse(data: $new_room, message: "اتاق مورد نظر با موفقیت اضافه شد");
     }
-    public function update($id ,$request){
+    public function update($id, $request)
+    {
         $this->validate([
-            
+
             "title||required|min:5|string",
             "room_detail||string",
             "capacity||number",
@@ -67,24 +68,71 @@ class RoomController extends Controller
 
         ], $request);
         $new_room = $this->queryBuilder->table('rooms')->update([
-            
+
             "title" => $request->title,
             "room_detail" => $request->room_detail,
             "capacity" => $request->capacity,
             "addition_capacity" => $request->addition_capacity,
-            
+
             "updated_at" => time(),
-        ])->where(value:$id)->execute();
+        ])->where(value: $id)->execute();
         return $this->sendResponse(data: $new_room, message: "اتاق مورد نظر با موفقیت ویرایش شد");
-  
+
     }
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $deleted_room = $this->queryBuilder->table('rooms')->update([
-            'deleted_at' => time()
-        ])->where(value:$id)->execute();
-        if($deleted_room)
-        return $this->sendResponse(data: $deleted_room, message: "اتاق مورد نظر با موفقیت حذف شد");
-    else 
-    return $this->sendResponse(error:true,status:HTTP_BadREQUEST, message: " اتاق مورد نظر یافت نشد");
+            'deleted_at' => time(),
+        ])->where(value: $id)->execute();
+        if ($deleted_room) {
+            return $this->sendResponse(data: $deleted_room, message: "اتاق مورد نظر با موفقیت حذف شد");
+        } else {
+            return $this->sendResponse(error: true, status: HTTP_BadREQUEST, message: " اتاق مورد نظر یافت نشد");
+        }
+
+    }
+    public function append_feature($request)
+    {
+        $this->validate([
+            "room_id||required|number",
+            "feature_id||required|number",
+        ], $request);
+        // dd("ok");
+        $getRoom = $this->queryBuilder->table("rooms")->where($request->room_id, 'id')->get()->execute();
+        if (!$getRoom) {
+            return $this->sendResponse(data: $getRoom, message: "اتاق مورد نظر یافت نشد", error: true, status: HTTP_NotFOUND);
+        }
+        $checkRoom = $this->queryBuilder->table("features")->where($request->feature_id, 'id')->get()->execute();
+        if (!$checkRoom) {
+            return $this->sendResponse(data: $checkRoom, message: "ویژگی مورد نظر یافت نشد", error: true, status: HTTP_NotFOUND);
+        }
+        $append_feature = $this->queryBuilder->table('room_feature')->insert([
+            "room_id" => $request->room_id,
+            "feature_id" => $request->feature_id,
+            "created_at" => time(),
+            
+            ])->execute();
+            return $this->sendResponse(data: $append_feature, message: "ویژگی مورد نظر با موفقیت به اتاق شما اضافه شد");
+
+    }
+    public function add_feature($request)
+    {
+        $this->validate([
+            "title||required|string",
+         
+        ], $request);
+        $add_feature = $this->queryBuilder->table('features')->insert([
+           "title"=>$request->title,
+            "created_at" => time(),
+            "updated_at" => time(),
+            ])->execute();
+            if( $add_feature ){
+            return $this->sendResponse(data: $add_feature, message: "ویژگی مورد نظر با موفقیت  اضافه شد");
+        }else{
+                return $this->sendResponse(data:[], message: "ویژگی مورد نظر اضافه نشد", error: true, status: HTTP_NotFOUND);
+
+            }
+        
+
     }
 }
