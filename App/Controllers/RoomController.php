@@ -140,4 +140,23 @@ class RoomController extends Controller
         }
 
     }
+    public function room_like($request){
+        $this->validate([
+            'room_id||number'
+        ], $request);
+        $room = $this->queryBuilder->table('rooms')->where($request->room_id)->get()->execute();
+        $get_like = $this->queryBuilder->table('room_like')->where($request->room_id , "room_id")->where($request->userDetail->id , 'user_id')->get()->execute();
+        if (!$room)
+            return $this->sendResponse(status: HTTP_BadREQUEST, error: true, message: "اتاق مورد نظر پیدا نشد");
+        if($get_like){
+            $deleted_like = $this->queryBuilder->table('room_like')->delete()->where($get_like->id)->execute();
+                return $this->sendResponse(data: $deleted_like, message: " لایک پست مورد نظر با موفقیت برداشته شد ");
+            }
+            $room_like = $this->queryBuilder->table('room_like')->insert([
+                'room_id' => $request->room_id,
+                'user_id' => $request->userDetail->id,
+                'created_at' => time()
+                ])->execute();
+                return $this->sendResponse(data: $room_like, message: "پست مورد نظر با موفقیت لایک شد");
+    }
 }

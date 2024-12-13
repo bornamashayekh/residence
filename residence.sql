@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 13, 2024 at 07:02 PM
+-- Generation Time: Dec 13, 2024 at 07:30 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -121,6 +121,27 @@ INSERT INTO `room_feature` (`id`, `room_id`, `feature_id`, `created_at`, `delete
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `room_like`
+--
+
+CREATE TABLE `room_like` (
+  `id` int(11) UNSIGNED NOT NULL,
+  `room_id` int(11) UNSIGNED NOT NULL,
+  `user_id` int(11) UNSIGNED NOT NULL,
+  `created_at` bigint(20) NOT NULL,
+  `deleted_at` bigint(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+--
+-- Dumping data for table `room_like`
+--
+
+INSERT INTO `room_like` (`id`, `room_id`, `user_id`, `created_at`, `deleted_at`) VALUES
+(4, 1, 6, 1734114557, NULL);
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `users`
 --
 
@@ -198,6 +219,12 @@ ALTER TABLE `room_feature`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `room_like`
+--
+ALTER TABLE `room_like`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -238,6 +265,12 @@ ALTER TABLE `rooms`
 --
 ALTER TABLE `room_feature`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `room_like`
+--
+ALTER TABLE `room_like`
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
