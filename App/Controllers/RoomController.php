@@ -17,13 +17,13 @@ class RoomController extends Controller
 // LEFT JOIN room_feature on rooms.id = room_feature.room_id
 // LEFT JOIN features on room_feature.feature_id = features.id
 // GROUP BY rooms.id
-        $rooms = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features'])->join('room_feature', 'rooms.id',"=",'room_feature.room_id','LEFT')->join("features"," room_feature.feature_id","=","features.id","LEFT")->groupBy('rooms.id')->getAll()->execute();
+        $rooms = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather'])->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")->groupBy('rooms.id')->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")->getAll()->execute();
         return $this->sendresponse(message: "لیست اتاق ها با موفقیت دریافت شد", data: $rooms);
     }
     public function get($id)
     {
 
-        $room = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features'])->join('room_feature', 'rooms.id',"=",'room_feature.room_id','LEFT')->join("features"," room_feature.feature_id","=","features.id","LEFT")->groupBy('rooms.id')->where(column:'rooms.id',value: $id)->get()->execute();
+        $room = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather'])->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")->groupBy('rooms.id')->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")->where(column: 'rooms.id', value: $id)->get()->execute();
         $room->features = explode(",", $room->features);
         if ($room) {
             return $this->sendresponse(message: "اتاق مورد نظر با موفقیت دریافت شد", data: $room);
@@ -36,6 +36,7 @@ class RoomController extends Controller
     {
         $this->validate([
             "host_id||number",
+            "destination_id||number",
             "title||required|min:5|string",
             "room_detail||string",
             "capacity||number",
@@ -52,6 +53,7 @@ class RoomController extends Controller
 
         $new_room = $this->queryBuilder->table('rooms')->insert([
             "host_id" => $request->host_id,
+            "destination_id" => $request->destination_id,
             "title" => $request->title,
             "room_detail" => $request->room_detail,
             "capacity" => $request->capacity,
