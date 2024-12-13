@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 07, 2024 at 10:21 AM
+-- Generation Time: Dec 13, 2024 at 07:02 PM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -41,7 +41,7 @@ CREATE TABLE `destinations` (
 --
 
 INSERT INTO `destinations` (`id`, `title`, `weather_id`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(2, 'اصفهان', 2, 1732651962, 1732652715, 1732652726);
+(2, 'اصفهان', 2, 1732651962, 1732652715, NULL);
 
 -- --------------------------------------------------------
 
@@ -57,6 +57,15 @@ CREATE TABLE `features` (
   `deleted_at` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
 
+--
+-- Dumping data for table `features`
+--
+
+INSERT INTO `features` (`id`, `title`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 'پارکینگ', 1733940439, 1733940439, NULL),
+(2, 'حمام', 1733946873, 1733946873, NULL),
+(3, 'باربیکیو', 1733946885, 1733946885, NULL);
+
 -- --------------------------------------------------------
 
 --
@@ -66,10 +75,13 @@ CREATE TABLE `features` (
 CREATE TABLE `rooms` (
   `id` int(11) UNSIGNED NOT NULL,
   `host_id` int(11) UNSIGNED NOT NULL,
+  `destination_id` int(11) NOT NULL,
   `title` varchar(255) NOT NULL,
   `room_detail` varchar(255) NOT NULL,
   `capacity` tinyint(3) UNSIGNED NOT NULL,
   `addition_capacity` tinyint(3) UNSIGNED DEFAULT NULL,
+  `daily_price` int(11) UNSIGNED NOT NULL,
+  `discount_percent` tinyint(3) UNSIGNED NOT NULL DEFAULT 0,
   `created_at` bigint(20) UNSIGNED NOT NULL,
   `updated_at` bigint(20) UNSIGNED NOT NULL,
   `deleted_at` bigint(20) UNSIGNED DEFAULT NULL
@@ -79,8 +91,9 @@ CREATE TABLE `rooms` (
 -- Dumping data for table `rooms`
 --
 
-INSERT INTO `rooms` (`id`, `host_id`, `title`, `room_detail`, `capacity`, `addition_capacity`, `created_at`, `updated_at`, `deleted_at`) VALUES
-(1, 3, 'خانه تست', 'اتاقی بزرگ و زیبا', 4, 1, 1733562896, 1733562896, NULL);
+INSERT INTO `rooms` (`id`, `host_id`, `destination_id`, `title`, `room_detail`, `capacity`, `addition_capacity`, `daily_price`, `discount_percent`, `created_at`, `updated_at`, `deleted_at`) VALUES
+(1, 3, 2, 'خانه برنا', '2اتاقی بزرگ و زیبا', 14, 1, 20000000, 0, 1733562896, 1733859915, NULL),
+(4, 3, 2, 'خانه تست', 'اتاقی بزرگ و زیبا', 4, 1, 0, 0, 1733860158, 1733860158, 1733860197);
 
 -- --------------------------------------------------------
 
@@ -95,6 +108,15 @@ CREATE TABLE `room_feature` (
   `created_at` bigint(20) NOT NULL,
   `deleted_at` bigint(20) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_persian_ci;
+
+--
+-- Dumping data for table `room_feature`
+--
+
+INSERT INTO `room_feature` (`id`, `room_id`, `feature_id`, `created_at`, `deleted_at`) VALUES
+(1, 1, 1, 1733940696, NULL),
+(2, 1, 2, 1733946890, NULL),
+(3, 1, 3, 1733946895, NULL);
 
 -- --------------------------------------------------------
 
@@ -203,19 +225,19 @@ ALTER TABLE `destinations`
 -- AUTO_INCREMENT for table `features`
 --
 ALTER TABLE `features`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `rooms`
 --
 ALTER TABLE `rooms`
-  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `room_feature`
 --
 ALTER TABLE `room_feature`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
