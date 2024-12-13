@@ -13,14 +13,18 @@ class RoomController extends Controller
     }
     public function index()
     {
-
-        $rooms = $this->queryBuilder->table('rooms')->getAll()->execute();
+// SELECT rooms.* , GROUP_CONCAT(features.title) as features FROM rooms
+// LEFT JOIN room_feature on rooms.id = room_feature.room_id
+// LEFT JOIN features on room_feature.feature_id = features.id
+// GROUP BY rooms.id
+        $rooms = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features'])->join('room_feature', 'rooms.id',"=",'room_feature.room_id','LEFT')->join("features"," room_feature.feature_id","=","features.id","LEFT")->groupBy('rooms.id')->getAll()->execute();
         return $this->sendresponse(message: "لیست اتاق ها با موفقیت دریافت شد", data: $rooms);
     }
     public function get($id)
     {
 
-        $room = $this->queryBuilder->table('rooms')->where(value: $id)->get()->execute();
+        $room = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features'])->join('room_feature', 'rooms.id',"=",'room_feature.room_id','LEFT')->join("features"," room_feature.feature_id","=","features.id","LEFT")->groupBy('rooms.id')->where(column:'rooms.id',value: $id)->get()->execute();
+        $room->features = explode(",", $room->features);
         if ($room) {
             return $this->sendresponse(message: "اتاق مورد نظر با موفقیت دریافت شد", data: $room);
         } else {
@@ -110,29 +114,28 @@ class RoomController extends Controller
             "room_id" => $request->room_id,
             "feature_id" => $request->feature_id,
             "created_at" => time(),
-            
-            ])->execute();
-            return $this->sendResponse(data: $append_feature, message: "ویژگی مورد نظر با موفقیت به اتاق شما اضافه شد");
+
+        ])->execute();
+        return $this->sendResponse(data: $append_feature, message: "ویژگی مورد نظر با موفقیت به اتاق شما اضافه شد");
 
     }
     public function add_feature($request)
     {
         $this->validate([
             "title||required|string",
-         
+
         ], $request);
         $add_feature = $this->queryBuilder->table('features')->insert([
-           "title"=>$request->title,
+            "title" => $request->title,
             "created_at" => time(),
             "updated_at" => time(),
-            ])->execute();
-            if( $add_feature ){
+        ])->execute();
+        if ($add_feature) {
             return $this->sendResponse(data: $add_feature, message: "ویژگی مورد نظر با موفقیت  اضافه شد");
-        }else{
-                return $this->sendResponse(data:[], message: "ویژگی مورد نظر اضافه نشد", error: true, status: HTTP_NotFOUND);
+        } else {
+            return $this->sendResponse(data: [], message: "ویژگی مورد نظر اضافه نشد", error: true, status: HTTP_NotFOUND);
 
-            }
-        
+        }
 
     }
 }
