@@ -21,7 +21,7 @@ class Router
     {
 
         $path = '/' . $version . $path;
-        $this->routes[$version]['GET'][$path] = ['controller' => $controller, 'method' => $method, 'request' => '', "requestMethod" => "get", "access" => $access, "inaccessabilty" => $inaccessabilty];
+        $this->routes[$version]['GET'][$path] = ['controller' => $controller, 'method' => $method, 'request' => $this->postData, "requestMethod" => "get", "access" => $access, "inaccessabilty" => $inaccessabilty];
     }
 
     public function post($version, $path, $controller, $method, $access = false, $inaccessabilty = false)
@@ -100,14 +100,17 @@ class Router
 
             $controllerInstance = new $controller();
             if (isset($matches) && count($matches) && $requestMethod != "put") {
-                $controllerInstance->$method($matches["id"]);
+             
+                if ($requestMethod =="get" )   $controllerInstance->$method($matches["id"], $request);
+                else   $controllerInstance->$method($matches["id"]) ;
             } else {
                 if ($requestMethod == 'post') {
                     $controllerInstance->$method($request);
                 } else if ($requestMethod == 'put' && isset($matches)) {
                     $controllerInstance->$method($matches["id"], $request);
                 } else {
-                    $controllerInstance->$method();
+                    // dd($request);
+                    $controllerInstance->$method($request);
                 }
 
             }

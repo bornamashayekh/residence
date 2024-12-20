@@ -11,20 +11,34 @@ class RoomController extends Controller
         parent::__construct();
 
     }
-    public function index()
+    public function index($request)
     {
-// SELECT rooms.* , GROUP_CONCAT(features.title) as features FROM rooms
-// LEFT JOIN room_feature on rooms.id = room_feature.room_id
-// LEFT JOIN features on room_feature.feature_id = features.id
-// GROUP BY rooms.id
-        $rooms = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather'])->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")->groupBy('rooms.id')->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")->getAll()->execute();
+        // dd($request);
+        $rooms = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather', 'IF(room_like.id is NULL, 0 ,1) as liked'])
+        ->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')
+        ->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")
+        ->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')
+        ->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")
+        ->join("room_like", " room_like.room_id", "=", "rooms.id", "LEFT" , ["room_like.user_id",$request->userDetail->id ?? 0])
+        ->groupBy('rooms.id , room_like.id')
+        ->getAll()->execute();
         return $this->sendresponse(message: "لیست اتاق ها با موفقیت دریافت شد", data: $rooms);
     }
-    public function get($id)
+    public function get($id,$request)
     {
+        // dd($request);
 
-        $room = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather'])->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")->groupBy('rooms.id')->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")->where(column: 'rooms.id', value: $id)->get()->execute();
-        $room->features = explode(",", $room->features);
+        $room = $this->queryBuilder->table('rooms')->select([' rooms.* ', 'GROUP_CONCAT(features.title) as features', 'destinations.title as destination', 'weather.title as weather' , 'IF(room_like.id is NULL, 0 ,1) as liked'])
+        ->join('room_feature', 'rooms.id', "=", 'room_feature.room_id', 'LEFT')
+        ->join("features", " room_feature.feature_id", "=", "features.id", "LEFT")
+        ->join('destinations', 'rooms.destination_id', "=", 'destinations.id', 'LEFT')
+        ->join("weather", " destinations.weather_id", "=", "weather.id", "LEFT")
+         ->join("room_like", " room_like.room_id", "=", "rooms.id", "LEFT" , ["room_like.user_id",$request->userDetail->id ?? 0])
+         ->groupBy('rooms.id , room_like.id')
+         ->where(column: 'rooms.id', value: $id)
+        ->get()->execute();
+        dd($room);
+        if(isset($room->features)) $room->features = explode(",", $room->features);
         if ($room) {
             return $this->sendresponse(message: "اتاق مورد نظر با موفقیت دریافت شد", data: $room);
         } else {
@@ -140,23 +154,26 @@ class RoomController extends Controller
         }
 
     }
-    public function room_like($request){
+    public function room_like($request)
+    {
         $this->validate([
-            'room_id||number'
+            'room_id||number',
         ], $request);
         $room = $this->queryBuilder->table('rooms')->where($request->room_id)->get()->execute();
-        $get_like = $this->queryBuilder->table('room_like')->where($request->room_id , "room_id")->where($request->userDetail->id , 'user_id')->get()->execute();
-        if (!$room)
+        $get_like = $this->queryBuilder->table('room_like')->where($request->room_id, "room_id")->where($request->userDetail->id, 'user_id')->get()->execute();
+        if (!$room) {
             return $this->sendResponse(status: HTTP_BadREQUEST, error: true, message: "اتاق مورد نظر پیدا نشد");
-        if($get_like){
+        }
+
+        if ($get_like) {
             $deleted_like = $this->queryBuilder->table('room_like')->delete()->where($get_like->id)->execute();
-                return $this->sendResponse(data: $deleted_like, message: " لایک پست مورد نظر با موفقیت برداشته شد ");
-            }
-            $room_like = $this->queryBuilder->table('room_like')->insert([
-                'room_id' => $request->room_id,
-                'user_id' => $request->userDetail->id,
-                'created_at' => time()
-                ])->execute();
-                return $this->sendResponse(data: $room_like, message: "پست مورد نظر با موفقیت لایک شد");
+            return $this->sendResponse(data: $deleted_like, message: " لایک پست مورد نظر با موفقیت برداشته شد ");
+        }
+        $room_like = $this->queryBuilder->table('room_like')->insert([
+            'room_id' => $request->room_id,
+            'user_id' => $request->userDetail->id,
+            'created_at' => time(),
+        ])->execute();
+        return $this->sendResponse(data: $room_like, message: "پست مورد نظر با موفقیت لایک شد");
     }
 }

@@ -39,8 +39,13 @@ class QueryBuilder {
         return $this;
     }
 
-    public function join($table, $first, $operator, $second, $type = 'INNER') {
-        $this->joins[] = "$type JOIN $table ON $first $operator $second";
+    public function join($table, $first, $operator, $second, $type = 'INNER' , $secondOn  = false) {
+        $join = "$type JOIN $table ON $first $operator $second" ;
+        if($secondOn){
+            $join .= " AND $secondOn[0] = $secondOn[1]";
+           
+        }
+        $this->joins[] = $join;
         return $this;
     }
 
@@ -151,6 +156,7 @@ class QueryBuilder {
             }
 
             if($this->getQuery){
+                // dd($sql);
                 $statement = $this->pdo->prepare($sql);
                 
                 $success = $statement->execute();
@@ -163,6 +169,7 @@ class QueryBuilder {
                 }
                 else {
                     $this->where = [];
+                    
                     return $statement->fetch(PDO::FETCH_OBJ);
                 }
             }
