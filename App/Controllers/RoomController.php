@@ -217,8 +217,10 @@ class RoomController extends Controller
         if (!$checkUser) {
             return $this->sendResponse(data: $checkUser, message: "کاربر مورد نظر یافت نشد", error: true, status: HTTP_NotFOUND);
         }
-        if ($request->userDetail->role == 'geust' || $request->userDetail->role == 'host')
+        if ($request->userDetail->role == 'geust' || $request->userDetail->role == 'host') {
             $request->user_id = $request->userDetail->id;
+            $request->status = 'pending';
+        }
         $reserved_room = $this->queryBuilder->table('reserves')->insert([
             'room_id' => $request->room_id,
             'user_id' =>  $request->user_id,
