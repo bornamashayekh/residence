@@ -176,4 +176,62 @@ class RoomController extends Controller
         ])->execute();
         return $this->sendResponse(data: $room_like, message: "پست مورد نظر با موفقیت لایک شد");
     }
+    public function room_reserve($request){
+       
+       
+     
+        $this->validate([
+            'room_id||required|number',
+            'user_id||number',
+            'entry_date||required|string',
+            'exit_date||required|string',
+            'status||enum:pending,payed,reject,cancel',
+        ],$request);
+         // getting date from user entry 
+        // gdate stands for gregorain date
+        
+        $entry_date = explode("/",$request->entry_date);
+        $entry_year = $entry_date[0];
+        $entry_month = $entry_date[1];
+        $entry_day = $entry_date[2];
+        // convering to gregorain and time stamp
+        $entry_timestamp = jmktime('14','00','00',$entry_month,$entry_day,$entry_year);
+        $request->entry_timestamp = $entry_timestamp;
+        
+        // getting date from user exit 
+        // gdate stands for gregorain date
+        $exit_date = explode("/",$request->exit_date);
+        $exit_year = $exit_date[0];
+        $exit_month = $exit_date[1];
+        $exit_day = $exit_date[2];
+        // convering to gregorain and time stamp
+        $exit_timestamp = jmktime('12','00','00',$exit_month,$exit_day,$exit_year);
+        $request->exit_timestamp = $exit_timestamp;
+       
+        // checking room and user by $id
+        $getRoom = $this->queryBuilder->table("rooms")->where($request->room_id, 'id')->get()->execute();
+        if (!$getRoom) {
+            return $this->sendResponse(data: $getRoom, message: "اتاق مورد نظر یافت نشد", error: true, status: HTTP_NotFOUND);
+        }
+        $checkUser = $this->queryBuilder->table("users")->where($request->user_id, 'id')->get()->execute();
+        if (!$checkUser) {
+            return $this->sendResponse(data: $checkUser, message: "کاربر مورد نظر یافت نشد", error: true, status: HTTP_NotFOUND);
+        }
+        if ($request->userDetail->role == 'geust' || $request->userDetail->role == 'host')
+            $request->user_id = $request->userDetail->id;
+        $reserved_room = $this->queryBuilder->table('reserves')->insert([
+            'room_id' => $request->room_id,
+            'user_id' =>  $request->user_id,
+            'entry_date' => $request->entry_date,
+            'entry_timestamp' => $request->entry_timestamp,
+            'exit_timestamp' => $request->exit_timestamp,
+            'exit_date' => $request->exit_date,
+            'status' => $request->status ?? 'pending',
+            'created_at' => time(),
+            'updated_at' => time(),
+
+        ])->execute();
+        return $this->sendResponse(data: $reserved_room, message: "اتاق مورد نظر با موفقیت رزرو شد");
+
+    }
 }
