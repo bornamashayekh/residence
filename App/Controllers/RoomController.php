@@ -10,7 +10,7 @@ class RoomController extends Controller
     {
         parent::__construct();
 
-    }
+    }   
     public function index($request)
     {
         // dd($request);
